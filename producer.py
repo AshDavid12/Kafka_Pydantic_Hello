@@ -1,32 +1,17 @@
-# streamlit_app.py
-#import streamlit as st
+
+import streamlit as st
 import asyncio
-from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
+#from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 from pydantic import BaseModel
 from confluent_kafka import Producer,Consumer,KafkaException, KafkaError
 
-# def main():
-#     st.title("Transcript Submission")
 
-#     st.header("Submit Your Transcript")
-#     transcript = st.text_area("Enter the transcript text here:", height=300)
 
-#     if st.button("Submit"):
-#         if transcript:
-#             st.success("Transcript submitted successfully!")
-#             st.write("Here is the transcript you submitted:")
-#             st.write(transcript)
-#         else:
-#             st.error("Please enter a transcript before submitting.")
+# transcript = '''
+# Oded David went on a walk. The dog was annoying. Then the dog met another dog names Chappy The Dog. Chappy family is the
+# Choen's. Joe Choen is a nice person.
 
-# if __name__ == "__main__":
-#     main()
-
-transcript = '''
-Oded David went on a walk. The dog was annoying. Then the dog met another dog names Chappy The Dog. Chappy family is the
-Choen's. Joe Choen is a nice person.
-
-'''
+# '''
 class Paragraph(BaseModel):
     text:str
 
@@ -35,9 +20,8 @@ class Paragraph(BaseModel):
 kafka_config_producer = {
     'bootstrap.servers': 'localhost:9092'
 }
-producer = Producer(kafka_config_producer)
+producer_paragraph = Producer(kafka_config_producer)
 topic = 'paragraph'
-
 
 
 
@@ -70,7 +54,24 @@ def delivery_report(err, msg):
         print(f'Message delivered to {msg.topic()} [{msg.partition()}] key: {msg.key()}, value: {msg.value()}')
         #the value is in byte format so the value will have a b and then the json string
 
-serialized_paragraphs = pydantic_paragraphs(transcript)
-send_to_kafka(producer,topic,serialized_paragraphs)
 
-producer.flush()
+
+producer_paragraph.flush()
+def main():
+    st.title("Transcript Submission")
+
+    st.header("Submit Your Transcript")
+    transcript = st.text_area("Enter the transcript text here:", height=300)
+
+    if st.button("Submit"):
+        if transcript:
+            st.success("Transcript submitted successfully!")
+            st.write("Here is the transcript you submitted:")
+            st.write(transcript)
+            serialized_paragraphs = pydantic_paragraphs(transcript)
+            send_to_kafka(producer_paragraph,topic,serialized_paragraphs)
+        else:
+            st.error("Please enter a transcript before submitting.")
+
+if __name__ == "__main__":
+    main()

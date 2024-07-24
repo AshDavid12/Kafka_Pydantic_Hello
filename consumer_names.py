@@ -7,19 +7,20 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-kafka_config_consumer2 = {
+kafka_config_consumer = {
     'bootstrap.servers': 'localhost:9092',  
-    'group.id': 'hiyyyppiww4',
+    'group.id': 'lltttttt',
     'auto.offset.reset': 'earliest' 
 }
 
 
-consumer2 = Consumer(kafka_config_consumer2)
+
+consumer_names = Consumer(kafka_config_consumer)
 topic_out = 'names'
-consumer2.subscribe([topic_out])
+consumer_names.subscribe([topic_out])
 def consume_names(consumer,timeout=1.0):
     try:
-        logging.info("Starting the consumer2...")
+        logging.info("Starting the consumer for names...")
         while True:
             msg = consumer.poll(timeout)
             if msg is None:
@@ -30,11 +31,11 @@ def consume_names(consumer,timeout=1.0):
                 else:
                     raise KafkaException(msg.error())
             else:
-                print(f'Received message: {msg.value().decode("utf-8")}')
+                print(f'Received message: {msg.value().decode("utf-8")}') ##getting the names
     except KeyboardInterrupt:
         logging.info("Consumer interrupted.")
     finally:
         consumer.close()
 
 if __name__ == "__main__":
-    consume_names(consumer2)
+    consume_names(consumer_names)
